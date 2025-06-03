@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .expense-form {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f8f8;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+        }
+        .delete-btn {
+            background-color: #ff4444;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Calculator</h1>
+        
+        <div class="expense-form">
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <input type="text" id="category" placeholder="Enter expense category">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount ($):</label>
+                <input type="number" id="amount" placeholder="Enter amount">
+            </div>
+            <button onclick="addExpense()">Add Expense</button>
+        </div>
+
+        <table id="expenseTable">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount ($)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="expenseList"></tbody>
+        </table>
+
+        <button onclick="calculateExpenses()">Calculate</button>
+
+        <div class="results" id="results" style="display: none;">
+            <h2>Results:</h2>
+            <p>Total Expenses: $<span id="totalExpenses">0</span></p>
+            <p>Average Daily Expense: $<span id="averageDaily">0</span></p>
+            <h3>Top 3 Largest Expenses:</h3>
+            <ul id="topExpenses"></ul>
+        </div>
+    </div>
+
+    <script>
+        let expenses = [];
+
+        function addExpense() {
+            const category = document.getElementById('category').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if (!category || isNaN(amount) || amount <= 0) {
+                alert('Please enter valid category and amount');
+                return;
+            }
+
+            expenses.push({ category, amount });
+            updateExpenseTable();
+            
+            // Clear inputs
+            document.getElementById('category').value = '';
+            document.getElementById('amount').value = '';
+        }
+
+        function deleteExpense(index) {
+            expenses.splice(index, 1);
+            updateExpenseTable();
+        }
+
+        function updateExpenseTable() {
+            const tbody = document.getElementById('expenseList');
+            tbody.innerHTML = '';
+
+            expenses.forEach((expense, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${expense.category}</td>
+                    <td>${expense.amount.toLocaleString()}</td>
+                    <td><button class="delete-btn" onclick="deleteExpense(${index})">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function calculateExpenses() {
+            if (expenses.length === 0) {
+                alert('Please add some expenses first');
+                return;
+            }
+
+            // Calculate total
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            
+            // Calculate average daily (assuming 30 days)
+            const averageDaily = total / 30;
+
+            // Get top 3 expenses
+            const topExpenses = [...expenses]
+                .sort((a, b) => b.amount - a.amount)
+                .slice(0, 3);
+
+            // Update results
+            document.getElementById('totalExpenses').textContent = total.toLocaleString();
+            document.getElementById('averageDaily').textContent = averageDaily.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            const topExpensesList = document.getElementById('topExpenses');
+            topExpensesList.innerHTML = topExpenses
+                .map(expense => `<li>${expense.category}: $${expense.amount.toLocaleString()}</li>`)
+                .join('');
+
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html> 

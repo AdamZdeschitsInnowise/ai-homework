@@ -1,0 +1,12 @@
+{
+  "name": "api-testing",
+  "version": "1.0.0",
+  "description": "API testing for Fake Store products",
+  "main": "test_api_products.js",
+  "scripts": {
+    "test": "node test_api_products.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  }
+} 
